@@ -1,5 +1,3 @@
-'use strict';
-
 /*
  * Copyright Joyent, Inc. and other Node contributors.
  *
@@ -23,10 +21,18 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-var test = require('mocha').test;
-var assert = require('assert');
+import * as t from "https://deno.land/std/testing/asserts.ts";
+import * as url from "../url.js";
 
-var url = require('../url');
+const t_assertEquals = (ac, ex) => {
+  const obj = {};
+  for (const name in ac) {
+    if (typeof ac[name] != "function") {
+      obj[name] = ac[name];
+    }
+  }
+  t.assertEquals(obj, ex);
+};
 
 /*
  * URLs to parse, and expected data
@@ -884,7 +890,7 @@ var parseTests = {
 };
 
 Object.keys(parseTests).forEach(function (u) {
-  test('parse(' + u + ')', function () {
+  Deno.test('parse(' + u + ')', function () {
     var actual = url.parse(u);
     var spaced = url.parse('     \t  ' + u + '\n\t');
     var expected = parseTests[u];
@@ -895,13 +901,13 @@ Object.keys(parseTests).forEach(function (u) {
       }
     });
 
-    assert.deepEqual(actual, expected);
-    assert.deepEqual(spaced, expected);
+    t_assertEquals(actual, expected);
+    t_assertEquals(spaced, expected);
 
     var expected = parseTests[u].href,
       actual = url.format(parseTests[u]);
 
-    assert.equal(actual, expected, 'format(' + u + ') == ' + u + '\nactual:' + actual);
+    t.assertEquals(actual, expected, 'format(' + u + ') == ' + u + '\nactual:' + actual);
   });
 });
 
@@ -958,7 +964,7 @@ var parseTestsWithQueryString = {
 };
 
 Object.keys(parseTestsWithQueryString).forEach(function (u) {
-  test('parse(' + u + ')', function () {
+  Deno.test('parse(' + u + ')', function () {
     var actual = url.parse(u, true);
     var expected = parseTestsWithQueryString[u];
     for (var i in actual) {
@@ -967,7 +973,7 @@ Object.keys(parseTestsWithQueryString).forEach(function (u) {
       }
     }
 
-    assert.deepEqual(actual, expected);
+    t_assertEquals(actual, expected);
   });
 });
 
@@ -1167,13 +1173,13 @@ var formatTests = {
 };
 
 Object.keys(formatTests).forEach(function (u) {
-  test('format(' + u + ')', function () {
+  Deno.test('format(' + u + ')', function () {
     var expect = formatTests[u].href;
     delete formatTests[u].href;
     var actual = url.format(u);
     var actualObj = url.format(formatTests[u]);
-    assert.equal(actual, expect, 'wonky format(' + u + ') == ' + expect + '\nactual:' + actual);
-    assert.equal(actualObj, expect, 'wonky format(' + JSON.stringify(formatTests[u]) + ') == ' + expect + '\nactual: ' + actualObj);
+    t.assertEquals(actual, expect, 'wonky format(' + u + ') == ' + expect + '\nactual:' + actual);
+    t.assertEquals(actualObj, expect, 'wonky format(' + JSON.stringify(formatTests[u]) + ') == ' + expect + '\nactual: ' + actualObj);
   });
 });
 
@@ -1282,10 +1288,10 @@ var relativeTests = [
 ];
 
 relativeTests.forEach(function (relativeTest) {
-  test('resolve(' + [relativeTest[0], relativeTest[1]] + ')', function () {
+  Deno.test('resolve(' + [relativeTest[0], relativeTest[1]] + ')', function () {
     var a = url.resolve(relativeTest[0], relativeTest[1]),
       e = relativeTest[2];
-    assert.equal(a, e, 'resolve(' + [relativeTest[0], relativeTest[1]] + ') == ' + e + '\n  actual=' + a);
+    t.assertEquals(a, e, 'resolve(' + [relativeTest[0], relativeTest[1]] + ') == ' + e + '\n  actual=' + a);
   });
 });
 
@@ -1300,8 +1306,9 @@ relativeTests.forEach(function (relativeTest) {
   [],
   {}
 ].forEach(function (val) {
-  test('parse(' + val + ')', function () {
-    assert['throws'](function () { url.parse(val); }, TypeError);
+  Deno.test('parse(' + val + ')', function () {
+    //assert['throws'](function () { url.parse(val); }, TypeError);
+    t.assertThrows(function () { url.parse(val); }, TypeError);
   });
 });
 
@@ -1996,10 +2003,10 @@ var relativeTests2 = [
 ];
 
 relativeTests2.forEach(function (relativeTest) {
-  test('resolve(' + [relativeTest[1], relativeTest[0]] + ')', function () {
+  Deno.test('resolve(' + [relativeTest[1], relativeTest[0]] + ')', function () {
     var a = url.resolve(relativeTest[1], relativeTest[0]),
       e = relativeTest[2];
-    assert.equal(a, e, 'resolve(' + [relativeTest[1], relativeTest[0]] + ') == ' + e + '\n  actual=' + a);
+    t.assertEquals(a, e, 'resolve(' + [relativeTest[1], relativeTest[0]] + ') == ' + e + '\n  actual=' + a);
   });
 });
 
@@ -2014,16 +2021,16 @@ var emptyIsImportant = { host: true, hostname: '' };
 
 // format: [from, path, expected]
 relativeTests.forEach(function (relativeTest) {
-  test('resolveObject(' + [relativeTest[0], relativeTest[1]] + ')', function () {
+  Deno.test('resolveObject(' + [relativeTest[0], relativeTest[1]] + ')', function () {
     var actual = url.resolveObject(url.parse(relativeTest[0]), relativeTest[1]);
     var expected = url.parse(relativeTest[2]);
 
-    assert.deepEqual(actual, expected);
+    t.assertEquals(actual, expected);
 
     expected = relativeTest[2];
     actual = url.format(actual);
 
-    assert.equal(actual, expected, 'format(' + actual + ') == ' + expected + '\nactual:' + actual);
+    t.assertEquals(actual, expected, 'format(' + actual + ') == ' + expected + '\nactual:' + actual);
   });
 });
 
@@ -2043,15 +2050,15 @@ if (relativeTests2[181][0] === './/g' && relativeTests2[181][1] === 'f:/a' && re
 }
 
 relativeTests2.forEach(function (relativeTest) {
-  test('resolveObject(' + [relativeTest[1], relativeTest[0]] + ')', function () {
+  Deno.test('resolveObject(' + [relativeTest[1], relativeTest[0]] + ')', function () {
     var actual = url.resolveObject(url.parse(relativeTest[1]), relativeTest[0]),
       expected = url.parse(relativeTest[2]);
 
-    assert.deepEqual(actual, expected);
+    t.assertEquals(actual, expected);
 
     var expected = relativeTest[2],
       actual = url.format(actual);
 
-    assert.equal(actual, expected, 'format(' + relativeTest[1] + ') == ' + expected + '\nactual:' + actual);
+    t.assertEquals(actual, expected, 'format(' + relativeTest[1] + ') == ' + expected + '\nactual:' + actual);
   });
 });

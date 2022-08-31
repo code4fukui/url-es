@@ -103,7 +103,7 @@ var protocolPattern = /^([a-z0-9.+-]+:)/i,
     'ftp:': true,
     'gopher:': true,
     'file:': true
-  },
+  };
   //querystring = require('querystring');
 
 function urlParse(url, parseQueryString, slashesDenoteHost) {
