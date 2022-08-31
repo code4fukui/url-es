@@ -21,8 +21,8 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-
-//var punycode = require('punycode');
+import { querystring } from "https://code4fukui.github.io/querystring/querystring.js";
+import { Punycode } from "https://code4fukui.github.io/Punycode/Punycode.js";
 
 export function Url() {
   this.protocol = null;
@@ -104,7 +104,7 @@ var protocolPattern = /^([a-z0-9.+-]+:)/i,
     'gopher:': true,
     'file:': true
   },
-  querystring = null; // require('querystring');
+  //querystring = require('querystring');
 
 function urlParse(url, parseQueryString, slashesDenoteHost) {
   if (url && typeof url === 'object' && url instanceof Url) { return url; }
@@ -317,8 +317,7 @@ Url.prototype.parse = function (url, parseQueryString, slashesDenoteHost) {
        * have non-ASCII characters, i.e. it doesn't matter if
        * you call it with a domain that already is ASCII-only.
        */
-      //this.hostname = punycode.toASCII(this.hostname);
-      throw new Error("punycode is not supported yet");
+      this.hostname = Punycode.toASCII(this.hostname);
     }
 
     var p = this.port ? ':' + this.port : '';
