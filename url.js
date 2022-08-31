@@ -21,11 +21,10 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-'use strict';
 
-var punycode = require('punycode');
+//var punycode = require('punycode');
 
-function Url() {
+export function Url() {
   this.protocol = null;
   this.slashes = null;
   this.auth = null;
@@ -105,7 +104,7 @@ var protocolPattern = /^([a-z0-9.+-]+:)/i,
     'gopher:': true,
     'file:': true
   },
-  querystring = require('querystring');
+  querystring = null; // require('querystring');
 
 function urlParse(url, parseQueryString, slashesDenoteHost) {
   if (url && typeof url === 'object' && url instanceof Url) { return url; }
@@ -318,7 +317,8 @@ Url.prototype.parse = function (url, parseQueryString, slashesDenoteHost) {
        * have non-ASCII characters, i.e. it doesn't matter if
        * you call it with a domain that already is ASCII-only.
        */
-      this.hostname = punycode.toASCII(this.hostname);
+      //this.hostname = punycode.toASCII(this.hostname);
+      throw new Error("punycode is not supported yet");
     }
 
     var p = this.port ? ':' + this.port : '';
@@ -765,9 +765,7 @@ Url.prototype.parseHost = function () {
   if (host) { this.hostname = host; }
 };
 
-exports.parse = urlParse;
-exports.resolve = urlResolve;
-exports.resolveObject = urlResolveObject;
-exports.format = urlFormat;
-
-exports.Url = Url;
+export const parse = urlParse;
+export const resolve = urlResolve;
+export const resolveObject = urlResolveObject;
+export const format = urlFormat;

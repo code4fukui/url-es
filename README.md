@@ -5,7 +5,8 @@
 This module has utilities for URL resolution and parsing meant to have feature parity with node.js core [url](http://nodejs.org/api/url.html) module.
 
 ```js
-var url = require('url');
+import * as url from "./url.js";
+console.log(url.resolve('/one/two/three', 'four'));         // '/one/two/four'
 ```
 
 ## api
