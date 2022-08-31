@@ -1,0 +1,10 @@
+name: 'Tests'
+
+on: [pull_request, push]
+
+jobs:
+  tests:
+    uses: denoland/setup-deno@v1
+    with:
+      deno-version: v1.x
+      command: deno test
