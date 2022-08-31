@@ -1,11 +1,9 @@
-# node-url
+# url-es
 
-[![Build Status](https://travis-ci.org/defunctzombie/node-url.svg?branch=master)](https://travis-ci.org/defunctzombie/node-url)
-
-This module has utilities for URL resolution and parsing meant to have feature parity with node.js core [url](http://nodejs.org/api/url.html) module.
+This ES module has utilities for URL resolution and parsing meant to have feature parity with node.js core [url](http://nodejs.org/api/url.html) module.
 
 ```js
-import * as url from "./url.js";
+import * as url from "https://code4fukui.github.io/url-es/url.js";
 console.log(url.resolve('/one/two/three', 'four'));         // '/one/two/four'
 ```
 
