@@ -1,107 +1,109 @@
 # url-es
 
-This ES module has utilities for URL resolution and parsing meant to have feature parity with node.js core [url](http://nodejs.org/api/url.html) module.
+> 日本語のREADMEはこちらです: [README.ja.md](README.ja.md)
+
+[
+![deno-test](https://github.com/code4fukui/url-es/actions/workflows/test.yml/badge.svg)
+](https://github.com/code4fukui/url-es/actions/workflows/test.yml)
+
+An ES module for URL resolution and parsing, providing feature parity with the Node.js core [`url` module](http://nodejs.org/api/url.html). Designed for Deno and modern JavaScript environments.
+
+## Usage
+
+Import the module directly from its URL:
 
 ```js
 import * as url from "https://code4fukui.github.io/url-es/url.js";
-console.log(url.resolve('/one/two/three', 'four'));         // '/one/two/four'
+
+// Resolve a relative URL
+console.log(url.resolve('/one/two/three', 'four'));
+//> '/one/two/four'
+
+// Parse a URL string into an object
+const myUrl = url.parse('http://user:pass@host.com:8080/p/a/t/h?query=string#hash');
+console.log(myUrl.hostname);
+//> 'host.com'
+
+// Format a URL object back into a string
+console.log(url.format(myUrl));
+//> 'http://user:pass@host.com:8080/p/a/t/h?query=string#hash'
 ```
 
-## api
+## API
 
-Parsed URL objects have some or all of the following fields, depending on
-whether or not they exist in the URL string. Any parts that are not in the URL
-string will not be in the parsed object. Examples are shown for the URL
+### Parsed URL Object
 
-`'http://user:pass@host.com:8080/p/a/t/h?query=string#hash'`
+The `url.parse()` method returns a URL object. Its properties depend on the components present in the URL string.
 
-* `href`: The full URL that was originally parsed. Both the protocol and host are lowercased.
+Example for the URL `'http://user:pass@host.com:8080/p/a/t/h?query=string#hash'`:
 
-    Example: `'http://user:pass@host.com:8080/p/a/t/h?query=string#hash'`
+*   `href`: The full URL that was originally parsed. The protocol and host are lowercased.
+    *   Example: `'http://user:pass@host.com:8080/p/a/t/h?query=string#hash'`
 
-* `protocol`: The request protocol, lowercased.
+*   `protocol`: The request protocol, lowercased.
+    *   Example: `'http:'`
 
-    Example: `'http:'`
+*   `host`: The full lowercased host portion of the URL, including port.
+    *   Example: `'host.com:8080'`
 
-* `host`: The full lowercased host portion of the URL, including port
-  information.
+*   `auth`: The authentication information portion of a URL.
+    *   Example: `'user:pass'`
 
-    Example: `'host.com:8080'`
+*   `hostname`: The lowercased hostname portion of the host, without the port.
+    *   Example: `'host.com'`
 
-* `auth`: The authentication information portion of a URL.
+*   `port`: The port number portion of the host.
+    *   Example: `'8080'`
 
-    Example: `'user:pass'`
+*   `pathname`: The path section of the URL, which comes after the host and before the query.
+    *   Example: `'/p/a/t/h'`
 
-* `hostname`: Just the lowercased hostname portion of the host.
+*   `search`: The 'query string' portion of the URL, including the leading question mark.
+    *   Example: `'?query=string'`
 
-    Example: `'host.com'`
+*   `path`: Concatenation of `pathname` and `search`.
+    *   Example: `'/p/a/t/h?query=string'`
 
-* `port`: The port number portion of the host.
+*   `query`: The 'params' portion of the query string. If `parseQueryString` is `true`, it will be an object.
+    *   Example: `'query=string'` or `{'query':'string'}`
 
-    Example: `'8080'`
+*   `hash`: The 'fragment' portion of the URL, including the leading pound sign.
+    *   Example: `'#hash'`
 
-* `pathname`: The path section of the URL, that comes after the host and
-  before the query, including the initial slash if present.
+### `url.parse(urlStr, [parseQueryString], [slashesDenoteHost])`
 
-    Example: `'/p/a/t/h'`
+Takes a URL string and returns a URL object.
 
-* `search`: The 'query string' portion of the URL, including the leading
-  question mark.
+*   `urlStr` `<string>` The URL string to parse.
+*   `parseQueryString` `<boolean>` If `true`, the `query` property will be an object parsed by the `querystring` module. **Default:** `false`.
+*   `slashesDenoteHost` `<boolean>` If `true`, treat `//foo/bar` as `{ host: 'foo', pathname: '/bar' }` rather than `{ pathname: '//foo/bar' }`. **Default:** `false`.
 
-    Example: `'?query=string'`
+### `url.format(urlObj)`
 
-* `path`: Concatenation of `pathname` and `search`.
+Takes a parsed URL object and returns a formatted URL string. The formatting logic follows these rules:
 
-    Example: `'/p/a/t/h?query=string'`
+*   `href` is ignored.
+*   `protocol` is postfixed with `://` for `http`, `https`, `ftp`, `gopher`, and `file`. All other protocols are postfixed with `:`.
+*   `auth` will be used if present.
+*   `host` will be used in place of `hostname` and `port`.
+*   `hostname` and `port` are only used if `host` is absent.
+*   `search` will be used in place of `query`.
+*   `query` (if it's an object) will only be used if `search` is absent.
 
-* `query`: Either the 'params' portion of the query string, or a
-  querystring-parsed object.
+### `url.resolve(from, to)`
 
-    Example: `'query=string'` or `{'query':'string'}`
+Resolves a target URL (`to`) relative to a base URL (`from`) in the same way a browser resolves an anchor tag's `href`.
 
-* `hash`: The 'fragment' portion of the URL including the pound-sign.
+```js
+url.resolve('/one/two/three', 'four');         // '/one/two/four'
+url.resolve('http://example.com/', '/one');    // 'http://example.com/one'
+url.resolve('http://example.com/one', '/two'); // 'http://example.com/two'
+```
 
-    Example: `'#hash'`
+## Attribution
 
-The following methods are provided by the URL module:
+This module is a port of the Node.js core `url` module. Copyright Joyent, Inc. and other Node contributors.
 
-### url.parse(urlStr, [parseQueryString], [slashesDenoteHost])
+## License
 
-Take a URL string, and return an object.
-
-Pass `true` as the second argument to also parse
-the query string using the `querystring` module.
-Defaults to `false`.
-
-Pass `true` as the third argument to treat `//foo/bar` as
-`{ host: 'foo', pathname: '/bar' }` rather than
-`{ pathname: '//foo/bar' }`. Defaults to `false`.
-
-### url.format(urlObj)
-
-Take a parsed URL object, and return a formatted URL string.
-
-* `href` will be ignored.
-* `protocol` is treated the same with or without the trailing `:` (colon).
-  * The protocols `http`, `https`, `ftp`, `gopher`, `file` will be
-    postfixed with `://` (colon-slash-slash).
-  * All other protocols `mailto`, `xmpp`, `aim`, `sftp`, `foo`, etc will
-    be postfixed with `:` (colon)
-* `auth` will be used if present.
-* `hostname` will only be used if `host` is absent.
-* `port` will only be used if `host` is absent.
-* `host` will be used in place of `hostname` and `port`
-* `pathname` is treated the same with or without the leading `/` (slash)
-* `search` will be used in place of `query`
-* `query` (object; see `querystring`) will only be used if `search` is absent.
-* `search` is treated the same with or without the leading `?` (question mark)
-* `hash` is treated the same with or without the leading `#` (pound sign, anchor)
-
-### url.resolve(from, to)
-
-Take a base URL, and a href URL, and resolve them as a browser would for
-an anchor tag.  Examples:
-
-    url.resolve('/one/two/three', 'four')         // '/one/two/four'
-    url.resolve('http://example.com/', '/one')    // 'http://example.com/one'
-    url.resolve('http://example.com/one', '/two') // 'http://example.com/two'
+[MIT](https://github.com/code4fukui/url-es/blob/main/LICENSE)
